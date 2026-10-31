@@ -1,0 +1,8 @@
+{
+  "name": "accessible-evoting-portal",
+  "version": "1.0.0",
+  "description": "School prototype e-voting portal",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "pg": "^8.11.0" }
+}
