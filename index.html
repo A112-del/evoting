@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Accessible E-Voting Portal – School Prototype</title>
+<style>
+  :root{
+    --bg:#0b1d3a; --card:#14305c; --card2:#1b3f75; --line:#4b78b8;
+    --text:#ffffff; --muted:#bcd6ff; --blue:#2f9bff;
+    --c1:#ff9f43; --c2:#38c6ff; --c3:#3ddc84; --c4:#b78cff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,Arial,sans-serif;color:var(--text);
+    background:radial-gradient(circle at 15% 0%,#1d4f9c 0,transparent 45%),
+               radial-gradient(circle at 90% 10%,#6a2fa8 0,transparent 40%),var(--bg);
+    min-height:100vh;font-size:var(--fs,18px);line-height:1.5}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+  .tools{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-bottom:10px}
+  .tools button{background:#ffffff22;color:#fff;border:2px solid #ffffff55;border-radius:10px;padding:8px 12px;font:inherit;font-size:.85em;cursor:pointer}
+  h1{font-size:1.5em;margin:0 0 4px;background:linear-gradient(90deg,#ffd95a,#ff8ad4,#5fd6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);margin:0 0 16px}
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tab{flex:1;padding:12px;border-radius:12px;border:2px solid var(--line);background:transparent;color:#fff;font:inherit;font-weight:700;cursor:pointer}
+  .tab[aria-selected="true"]{background:linear-gradient(135deg,#2f9bff,#7a5cff);border-color:transparent}
+  .panel{background:linear-gradient(160deg,var(--card),#10264a);border:2px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 10px 30px #0006}
+  .panel h2{margin:0 0 16px;font-size:1.9em;color:#8fd0ff}
+  label{display:block;font-weight:700;margin:14px 0 6px}
+  input[type=text],input[type=password]{width:100%;padding:14px;border-radius:10px;border:2px solid var(--line);background:#0c1f40;color:#fff;font:inherit}
+  input:focus,button:focus-visible{outline:4px solid #ffd95a;outline-offset:2px}
+  .btn{margin-top:18px;background:linear-gradient(135deg,#2f9bff,#5b7bff);color:#fff;border:0;border-radius:12px;padding:14px 22px;font:inherit;font-weight:700;cursor:pointer}
+  .btn:hover{filter:brightness(1.12)}
+  .hint{margin-top:16px;display:inline-block;background:#0a3aa8;padding:2px 6px;font-size:.9em}
+  .err{color:#ffb4b4;font-weight:700;margin-top:12px;min-height:1.4em}
+  .cand{display:flex;align-items:center;gap:14px;padding:16px;margin:12px 0;border-radius:14px;border:2px solid var(--line);background:#0f2650;cursor:pointer;border-left-width:10px}
+  .cand:hover{background:#163463}
+  .cand input{width:26px;height:26px;accent-color:#ffd95a;flex:none}
+  .cand .ico{font-size:2em;flex:none}
+  .cand b{font-size:1.1em;display:block}
+  .cand span{color:var(--muted);font-weight:600}
+  .k1{border-left-color:var(--c1)} .k2{border-left-color:var(--c2)} .k3{border-left-color:var(--c3)} .k4{border-left-color:var(--c4)}
+  .cand:has(input:checked){background:#244f93;border-color:#ffd95a}
+  .note{background:#1f4b8a;padding:14px 16px;border-radius:10px;margin:18px 0 0}
+  .res{margin:16px 0}
+  .res .top{display:flex;justify-content:space-between;font-weight:700;margin-bottom:6px;gap:8px}
+  .bar{height:26px;background:#0c1f40;border-radius:13px;overflow:hidden;border:2px solid #ffffff22}
+  .bar i{display:block;height:100%;width:0;border-radius:13px;transition:width .6s}
+  .total{margin-top:18px;color:var(--muted)}
+  .hidden{display:none}
+  .done{text-align:center;padding:10px}
+  .done .big{font-size:3.5em}
+  footer{margin-top:24px;text-align:center;color:var(--muted);font-size:.8em}
+  @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tools" role="toolbar" aria-label="Accessibility tools">
+    <button id="smaller" aria-label="Make text smaller">A−</button>
+    <button id="bigger" aria-label="Make text bigger">A+</button>
+    <button id="speak" aria-label="Read this page aloud">🔊 Read aloud</button>
+  </div>
+
+  <h1>Accessible E-Voting Portal</h1>
+  <p class="sub">Vote from home. Vote counts can be seen by the admin only.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tabVote" aria-selected="true">🗳️ Vote</button>
+    <button class="tab" role="tab" id="tabRes" aria-selected="false">🔒 Admin results</button>
+  </div>
+
+  <!-- LOGIN -->
+  <section class="panel" id="login">
+    <h2>Voter login</h2>
+    <label for="vid">Demo voter ID</label>
+    <input type="text" id="vid" autocomplete="off" placeholder="DEMO-PWD-001">
+    <label for="vcode">Certificate code</label>
+    <input type="password" id="vcode" autocomplete="off">
+    <button class="btn" id="loginBtn">Verify and continue</button>
+    <div class="hint">Test accounts: DEMO-PWD-001 to DEMO-PWD-100 · Code: PWD-DEMO-2026</div>
+    <div class="err" id="loginErr" role="alert"></div>
+  </section>
+
+  <!-- BALLOT -->
+  <section class="panel hidden" id="ballot">
+    <h2>Choose your candidate</h2>
+    <label class="cand k1"><input type="radio" name="c" value="c1"><span class="ico">🐺</span><div><b>Candidate 1</b><span>Symbol: wolf face</span></div></label>
+    <label class="cand k2"><input type="radio" name="c" value="c2"><span class="ico">🏔️</span><div><b>Candidate 2</b><span>Symbol: mountains</span></div></label>
+    <label class="cand k3"><input type="radio" name="c" value="c3"><span class="ico">🍃</span><div><b>Candidate 3</b><span>Symbol: leaf</span></div></label>
+    <label class="cand k4"><input type="radio" name="c" value="nota"><span class="ico">🚫</span><div><b>Candidate 4 (NOTA)</b><span>None of the above</span></div></label>
+    <div class="note">Please make your choice privately. Once submitted, the demo account cannot vote again.</div>
+    <button class="btn" id="submitBtn">Submit my vote</button>
+    <div class="err" id="voteErr" role="alert"></div>
+  </section>
+
+  <!-- THANK YOU -->
+  <section class="panel hidden" id="thanks">
+    <div class="done">
+      <div class="big">🎉</div>
+      <h2>Thank you! Your vote is recorded.</h2>
+      <p>This account cannot vote again.</p>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="panel hidden" id="results">
+    <h2>Admin results</h2>
+    <div id="adminLogin">
+      <label for="apw">Admin password</label>
+      <input type="password" id="apw" autocomplete="off">
+      <button class="btn" id="adminBtn">Show results</button>
+      <div class="err" id="adminErr" role="alert"></div>
+    </div>
+    <div id="adminView" class="hidden">
+      <div id="bars"></div>
+      <div class="total" id="total"></div>
+      <button class="btn" id="adminOut">Lock results</button>
+    </div>
+  </section>
+
+  <footer>Independent school prototype — not connected to the Election Commission of India.</footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const NAMES = [
+  ["c1","🐺 Candidate 1 (wolf face)","#ff9f43"],
+  ["c2","🏔️ Candidate 2 (mountains)","#38c6ff"],
+  ["c3","🍃 Candidate 3 (leaf)","#3ddc84"],
+  ["nota","🚫 Candidate 4 (NOTA)","#b78cff"]
+];
+let session = null, timer = null, adminPw = null;
+
+async function api(path, body) {
+  const r = await fetch(path, body ? {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)} : {});
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || "Something went wrong. Is the server running?");
+  return data;
+}
+function show(id) {
+  ["login","ballot","thanks","results"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+}
+function showVoteSide() {
+  show(!session ? "login" : "ballot");
+  stopPolling();
+  $("tabVote").setAttribute("aria-selected","true"); $("tabRes").setAttribute("aria-selected","false");
+}
+function showResults() {
+  show("results");
+  $("tabVote").setAttribute("aria-selected","false"); $("tabRes").setAttribute("aria-selected","true");
+  stopPolling();
+  if (adminPw) startAdminView();
+}
+function startAdminView() {
+  $("adminLogin").classList.add("hidden"); $("adminView").classList.remove("hidden");
+  loadResults(); timer = setInterval(loadResults, 3000);
+}
+function lockAdmin() {
+  adminPw = null; stopPolling(); $("apw").value = "";
+  $("adminView").classList.add("hidden"); $("adminLogin").classList.remove("hidden");
+}
+function stopPolling(){ if (timer) clearInterval(timer); timer = null; }
+
+async function loadResults() {
+  try {
+    const d = await api("/api/results", {password: adminPw});
+    const max = Math.max(1, d.total);
+    $("bars").innerHTML = NAMES.map(([k,label,color]) => {
+      const n = d.counts[k];
+      return `<div class="res"><div class="top"><span>${label}</span><span>${n} vote${n===1?"":"s"}</span></div>
+        <div class="bar" role="img" aria-label="${label}: ${n} votes"><i style="width:${n/max*100}%;background:${color}"></i></div></div>`;
+    }).join("");
+    $("total").textContent = "Total votes counted: " + d.total + " · Updates automatically every 3 seconds.";
+  } catch (e) { lockAdmin(); $("adminErr").textContent = e.message; }
+}
+
+$("loginBtn").onclick = async () => {
+  $("loginErr").textContent = "";
+  const id = $("vid").value.trim().toUpperCase(), code = $("vcode").value.trim();
+  try {
+    const d = await api("/api/login", {id, code});
+    session = {id, code};
+    if (d.alreadyVoted) { show("thanks"); $("thanks").querySelector("h2").textContent = "This account has already voted."; }
+    else show("ballot");
+  } catch (e) { $("loginErr").textContent = e.message; }
+};
+$("submitBtn").onclick = async () => {
+  $("voteErr").textContent = "";
+  const sel = document.querySelector('input[name="c"]:checked');
+  if (!sel) { $("voteErr").textContent = "Please choose one option before submitting."; return; }
+  try {
+    await api("/api/vote", {id: session.id, code: session.code, choice: sel.value});
+    show("thanks");
+  } catch (e) { $("voteErr").textContent = e.message; }
+};
+$("adminBtn").onclick = async () => {
+  $("adminErr").textContent = "";
+  try {
+    const pw = $("apw").value;
+    await api("/api/results", {password: pw});
+    adminPw = pw; startAdminView();
+  } catch (e) { $("adminErr").textContent = e.message; }
+};
+$("adminOut").onclick = lockAdmin;
+$("apw").addEventListener("keydown", e => { if (e.key === "Enter") $("adminBtn").click(); });
+$("tabVote").onclick = showVoteSide;
+$("tabRes").onclick = showResults;
+$("vcode").addEventListener("keydown", e => { if (e.key === "Enter") $("loginBtn").click(); });
+
+// Accessibility tools
+let fs = 18;
+$("bigger").onclick = () => { fs = Math.min(30, fs + 2); document.body.style.setProperty("--fs", fs + "px"); };
+$("smaller").onclick = () => { fs = Math.max(14, fs - 2); document.body.style.setProperty("--fs", fs + "px"); };
+$("speak").onclick = () => {
+  if (!("speechSynthesis" in window)) return alert("Read aloud is not supported in this browser.");
+  speechSynthesis.cancel();
+  const panel = [...document.querySelectorAll(".panel")].find(p => !p.classList.contains("hidden"));
+  speechSynthesis.speak(new SpeechSynthesisUtterance(panel.innerText));
+};
+</script>
+</body>
+</html>
